@@ -14,16 +14,26 @@ namespace BillsToPay.Services
             this.repository = repository;
         }
 
+        private int DelayedDays(DateTime dueDate, DateTime payDate)
+        {
+            int sub = (payDate - dueDate).Days;
+            return sub > 0 ? sub : 0;
+        }
         private decimal Interest(int delayedDays) => delayedDays <= 3 ? 0.1m : delayedDays > 3 && delayedDays < 5 ? 0.2m : 0.3m;
         private decimal Fine(int delayedDays) => delayedDays <= 3 ? 2 : delayedDays > 3 && delayedDays < 5 ? 3 : 5;
-        private decimal ActualPrice(decimal originalPrice, decimal interest, decimal fine) => 
+        private decimal ActualPrice(decimal originalPrice, decimal interest, decimal fine) =>
             originalPrice + ((originalPrice * interest) / 100) + ((originalPrice * fine) / 100);
-        
-        public List<Bill> GetBills()
+
+        public List<BillDTO> GetBills()
         {
-            return new List<Bill>();
+            return repository.GetBills().Select(e => new BillDTO
+            {
+                DelayedDays = DelayedDays(e.DueDate, e.PayDate),
+                Name = e.Name,
+                PayDate = e.PayDate,
+                OriginalPrice = e.OriginalPrice,
+                ActualPrice = ActualPrice(e.OriginalPrice, e.Interest, e.Fine)
+            }).ToList();
         }
-
-
     }
 }
