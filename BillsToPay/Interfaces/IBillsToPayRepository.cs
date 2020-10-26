@@ -7,7 +7,7 @@ namespace BillsToPay.Interfaces
 {
     public interface IBillsToPayRepository
     {
-        public List<Bill> GetBills();
-        public void AddBill(Bill bill);
+        List<Bill> GetBills();
+        void AddBill(Bill bill);
     }
 }

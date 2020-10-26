@@ -19,9 +19,9 @@ namespace BillsToPay.Services
         private decimal ActualPrice(decimal originalPrice, decimal interest, decimal fine) =>
             originalPrice + ((originalPrice * interest) + (originalPrice * fine));
 
-        public List<BillDTO> GetBills()
+        public List<BillResponseDTO> GetBills()
         {
-            return repository.GetBills().Select(e => new BillDTO
+            return repository.GetBills().Select(e => new BillResponseDTO
             {
                 DelayedDays = DelayedDays(e.DueDate, e.PayDate),
                 Name = e.Name,
@@ -31,10 +31,9 @@ namespace BillsToPay.Services
             }).ToList();
         }
 
-        public void AddBill(Bill bill)
-        {
-            var duesDate = DueDaysPercent.Values.FirstOrDefault(e => e.Validate((bill.DueDate - bill.PayDate).Days));            
-            repository.AddBill(new Bill(bill.Name, bill.OriginalPrice, bill.DueDate, bill.PayDate, duesDate.Interest, duesDate.Fine));
+        public void AddBill(BillDTO bill)
+        {             
+            repository.AddBill(Bill.Of(bill.Name, bill.OriginalPrice, bill.DueDate, bill.PayDate));
         }
     }
 }

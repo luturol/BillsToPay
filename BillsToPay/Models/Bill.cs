@@ -13,7 +13,13 @@ namespace BillsToPay.Models
         public decimal Interest { get; private set; }
         public decimal Fine { get; private set; }
 
-        public Bill(string name, decimal originalPrice, DateTime dueDate, DateTime payDate, decimal interest, decimal fine)
+        public static Bill Of(string name, decimal originalPrice, DateTime dueDate, DateTime payDate)
+        {            
+            var percentDue = DueDaysPercent.Values.First(e => e.Validate((payDate - dueDate).Days));
+            return new Bill(name, originalPrice, dueDate, payDate, percentDue.Interest, percentDue.Fine);
+        }
+
+        private Bill(string name, decimal originalPrice, DateTime dueDate, DateTime payDate, decimal interest, decimal fine)
         {
             Name = name;
             OriginalPrice = originalPrice;
