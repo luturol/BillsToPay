@@ -31,9 +31,9 @@ namespace BillsToPay.Services
             }).ToList();
         }
 
-        public void AddBill(BillDTO bill)
+        public Bill AddBill(BillDTO bill)
         {             
-            repository.AddBill(Bill.Of(bill.Name, bill.OriginalPrice, bill.DueDate, bill.PayDate));
+            return repository.AddBill(Bill.Of(bill.Name, bill.OriginalPrice, bill.DueDate, bill.PayDate));
         }
     }
 }

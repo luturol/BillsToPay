@@ -8,6 +8,6 @@ namespace BillsToPay.Interfaces
     public interface IBillsToPayService
     {
         List<BillResponseDTO> GetBills();
-        void AddBill(BillDTO bill);
+        Bill AddBill(BillDTO bill);
     }
 }
