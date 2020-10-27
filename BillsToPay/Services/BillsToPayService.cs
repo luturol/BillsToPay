@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using BillsToPay.Interfaces;
 using BillsToPay.Models;
 
@@ -19,19 +20,20 @@ namespace BillsToPay.Services
         private decimal ActualPrice(decimal originalPrice, decimal interest, decimal fine) =>
             originalPrice + ((originalPrice * interest) + (originalPrice * fine));
 
-        public List<BillResponseDTO> GetBills()
+        public async Task<IEnumerable<BillResponseDTO>> GetBills()
         {
-            return repository.GetBills().Select(e => new BillResponseDTO
+            var bills = await repository.GetBills();
+            return bills.ToList().Select(e => new BillResponseDTO
             {
                 DelayedDays = DelayedDays(e.DueDate, e.PayDate),
                 Name = e.Name,
                 PayDate = e.PayDate,
                 OriginalPrice = e.OriginalPrice,
                 ActualPrice = ActualPrice(e.OriginalPrice, e.Interest, e.Fine)
-            }).ToList();
+            });
         }
 
-        public Bill AddBill(BillDTO bill)
+        public Task<Bill> AddBill(BillDTO bill)
         {             
             return repository.AddBill(Bill.Of(bill.Name, bill.OriginalPrice, bill.DueDate, bill.PayDate));
         }

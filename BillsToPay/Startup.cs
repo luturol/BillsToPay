@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BillsToPay.Interfaces;
+using BillsToPay.Repositories;
+using BillsToPay.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -25,6 +28,8 @@ namespace BillsToPay
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddTransient<IBillsToPayRepository, BillsToPayRepository>();
+            services.AddTransient<IBillsToPayService, BillsToPayService>();
             services.AddControllers();
         }
 

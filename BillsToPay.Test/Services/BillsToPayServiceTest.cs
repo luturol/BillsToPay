@@ -5,6 +5,8 @@ using Moq;
 using BillsToPay.Interfaces;
 using System.Collections.Generic;
 using BillsToPay.Services;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace BillsToPay.Test.Serivces
 {
@@ -13,33 +15,33 @@ namespace BillsToPay.Test.Serivces
         private Mock<IBillsToPayRepository> mockRepository = new Mock<IBillsToPayRepository>();
 
         [Fact]
-        public void Should_Be_Able_To_Calculate_ActualPrice_Giving_Non_Zero_Due_And_Interest()
+        public async Task Should_Be_Able_To_Calculate_ActualPrice_Giving_Non_Zero_Due_And_InterestAsync()
         {
-            mockRepository.Setup(e => e.GetBills())
-                .Returns(new List<Bill>() {
+            IEnumerable<Bill> stub = new List<Bill>() {
                     Bill.Of("Light", 100m, new DateTime(2020, 10, 10), new DateTime(2020, 10, 16))
-            });
-            
-            var service = new BillsToPayService(mockRepository.Object);
-            var bills = service.GetBills();
+            };
+            mockRepository.Setup(e => e.GetBills())
+                .Returns(Task.FromResult(stub));
 
-            Assert.True(bills.Count > 0);
-            Assert.Equal(bills[0].ActualPrice, 105.3m);            
+            var service = new BillsToPayService(mockRepository.Object);
+            var bills = await service.GetBills();
+
+            Assert.True(bills.ToList().Count > 0);
+            Assert.Equal(bills.ToList()[0].ActualPrice, 105.3m);
         }
 
         [Fact]
-        public void Should_Be_Able_To_Calculate_ActualPrice_Giving_Zero_Due_And_Interest()
+        public async Task Should_Be_Able_To_Calculate_ActualPrice_Giving_Zero_Due_And_InterestAsync()
         {
+            IEnumerable<Bill> stub = new List<Bill>() { Bill.Of("Light", 100m, new DateTime(2020, 10, 10), new DateTime(2020, 10, 10)) };
             mockRepository.Setup(e => e.GetBills())
-                .Returns(new List<Bill>() {
-                    Bill.Of("Light", 100m, new DateTime(2020, 10, 10), new DateTime(2020, 10, 10))
-            });
+                .Returns(Task.FromResult(stub));
 
             var service = new BillsToPayService(mockRepository.Object);
-            var bills = service.GetBills();
+            var bills = await service.GetBills();
 
-            Assert.True(bills.Count > 0);
-            Assert.Equal(bills[0].ActualPrice, 100m);
+            Assert.True(bills.ToList().Count > 0);
+            Assert.Equal(bills.ToList()[0].ActualPrice, 100m);
         }
 
         [Fact]

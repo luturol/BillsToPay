@@ -19,6 +19,7 @@ namespace BillsToPay.Models
             return new Bill(name, originalPrice, dueDate, payDate, percentDue.Interest, percentDue.Fine);
         }
 
+        public Bill () { }
         private Bill(string name, decimal originalPrice, DateTime dueDate, DateTime payDate, decimal interest, decimal fine)
         {
             Name = name;
