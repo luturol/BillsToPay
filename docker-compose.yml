@@ -1,0 +1,30 @@
+version: '3.0'
+
+networks:
+    postgres-network:
+        driver: bridge
+
+services:
+    bills:
+        build: 
+            context: ./BillsToPay
+            dockerfile: DockerFile
+        ports:
+            - "8080:80"
+        networks:
+            - postgres-network
+            
+    some-postgres:
+        build: 
+            context: ./Script/
+            dockerfile: DockerFile
+        ports:
+            - "5432:5432"
+        environment: 
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=postgres
+            - PGDATA=/var/lib/postgresql/data/
+            - POSTGRES_DB=postgres       
+        networks:
+            - postgres-network       
+    

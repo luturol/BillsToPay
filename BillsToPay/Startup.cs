@@ -30,7 +30,7 @@ namespace BillsToPay
         {
             services.AddTransient<IBillsToPayRepository, BillsToPayRepository>();
             services.AddTransient<IBillsToPayService, BillsToPayService>();
-            services.AddControllers();
+            services.AddControllers();            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -41,6 +41,7 @@ namespace BillsToPay
                 app.UseDeveloperExceptionPage();
             }
 
+            
             app.UseHttpsRedirection();
 
             app.UseRouting();
