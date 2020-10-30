@@ -45,14 +45,13 @@ namespace BillsToPay.Test.Serivces
         }
 
         [Fact]
-        public void Should_Be_Able_To_Get_No_Due_To_Bill_Giving_PayDate_Less_Then_DueDate()
+        public async Task Should_Be_Able_To_Get_No_Due_To_Bill_Giving_PayDate_Less_Then_DueDateAsync()
         {
             mockRepository.Setup(e => e.AddBill(It.IsAny<Bill>()));
 
             var service = new BillsToPayService(mockRepository.Object);
-            var bill = Bill.Of("Water", 100, new DateTime(2020, 10, 10), new DateTime(2020, 10, 9));
 
-            service.AddBill(new BillDTO
+            var billReturn = await service.AddBill(new BillDTO
             {
                 Name = "Water",
                 OriginalPrice = 100,
@@ -61,6 +60,69 @@ namespace BillsToPay.Test.Serivces
             });
 
             mockRepository.Verify(e => e.AddBill(It.Is<Bill>(e => e.Name == "Water" && e.Interest == 0 && e.Fine == 0)), Times.AtLeastOnce());
+        }
+
+        [Fact]
+        public async Task Should_Be_Able_To_Get_No_Due_To_Bill_Giving_PayDate_Between_1_And_3_Days_After_Due_Date()
+        {
+            mockRepository.Setup(e => e.AddBill(It.IsAny<Bill>()));
+            var duePercents = DueDaysPercent.Till3Days;
+
+            var service = new BillsToPayService(mockRepository.Object);
+
+            var billReturn = await service.AddBill(new BillDTO
+            {
+                Name = "Water",
+                OriginalPrice = 100,
+                DueDate = new DateTime(2020, 10, 10),
+                PayDate = new DateTime(2020, 10, 11)
+            });
+
+            mockRepository.Verify(e => e.AddBill(It.Is<Bill>(e => e.Name == "Water" && 
+                                                                  e.Interest == duePercents.Interest && 
+                                                                  e.Fine == duePercents.Fine)), Times.AtLeastOnce());
+        }
+
+        [Fact]
+        public async Task Should_Be_Able_To_Get_No_Due_To_Bill_Giving_PayDate_Between_3_And_5_Days_After_Due_Date()
+        {
+            mockRepository.Setup(e => e.AddBill(It.IsAny<Bill>()));
+            var duePercent = DueDaysPercent.Between3And5Days;
+
+            var service = new BillsToPayService(mockRepository.Object);
+
+            var billReturn = await service.AddBill(new BillDTO
+            {
+                Name = "Water",
+                OriginalPrice = 100,
+                DueDate = new DateTime(2020, 10, 10),
+                PayDate = new DateTime(2020, 10, 14)
+            });
+
+            mockRepository.Verify(e => e.AddBill(It.Is<Bill>(e => e.Name == "Water" && 
+                                                                  e.Interest == duePercent.Interest && 
+                                                                  e.Fine == duePercent.Fine)), Times.AtLeastOnce());
+        }
+
+        [Fact]
+        public async Task Should_Be_Able_To_Get_No_Due_To_Bill_Giving_PayDate_After_5_Days_From_Due_Date()
+        {
+            mockRepository.Setup(e => e.AddBill(It.IsAny<Bill>()));
+            var duePercent = DueDaysPercent.After5Days;
+
+            var service = new BillsToPayService(mockRepository.Object);
+
+            var billReturn = await service.AddBill(new BillDTO
+            {
+                Name = "Water",
+                OriginalPrice = 100,
+                DueDate = new DateTime(2020, 10, 10),
+                PayDate = new DateTime(2020, 10, 16)
+            });
+
+            mockRepository.Verify(e => e.AddBill(It.Is<Bill>(e => e.Name == "Water" && 
+                                                                  e.Interest == duePercent.Interest && 
+                                                                  e.Fine == duePercent.Fine)), Times.AtLeastOnce());
         }
     }
 }
