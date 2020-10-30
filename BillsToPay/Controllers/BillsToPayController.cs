@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BillsToPay.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("bills")]
     public class BillsToPayController : ControllerBase
     {
         private IBillsToPayService service;
